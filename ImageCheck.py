@@ -50,6 +50,37 @@ def checkImageIncluded(baseImgPath, targetImgPath, percentage):
     else:
         return False
 
+# need to test
+def get_matchTemplate(baseImgPath, targetImgPath):
+    baseImg = cv2.imread(baseImgPath, cv2.IMREAD_UNCHANGED)
+    targetImg = cv2.imread(targetImgPath, cv2.IMREAD_UNCHANGED)
+
+    baseImgCopy = baseImg.copy()
+    res = cv2.matchTemplate(baseImgCopy, targetImg, cv2.TM_CCOEFF_NORMED)
+    return res
+
+def checkImageIncluded(baseImgPath, targetImgPath, percentage):
+    res = get_matchTemplate(baseImgPath, targetImgPath)
+    loc = np.where(res > percentage/100)
+
+    count = 0
+    for i in zip(*loc[::-1]):
+        print("location = ",i)
+        count += 1
+    if count>0:
+        return True
+    else:
+        return False
+
+def get_img_location(baseImgPath, targetImgPath):
+    res = get_matchTemplate(baseImgPath, targetImgPath)
+    baseImg = cv2.imread(baseImgPath, cv2.IMREAD_UNCHANGED)
+    w, h, _ = baseImg.shape[:2]
+
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+    cv2.rectangle(baseImgCopy, max_loc, (max_loc[0] + 100, max_loc[1] + 110), (0,0,255), 2)
+    return (max_loc[0] + w//2, max_loc[1] + 50 + h//2)
+
 
 '''
 TO DO:
